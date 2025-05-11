@@ -1,0 +1,2 @@
+ALTER TABLE "fund_yearly_amounts" ADD COLUMN "create_at" timestamp with time zone DEFAULT now();--> statement-breakpoint
+ALTER TABLE "fund_yearly_amounts" ADD COLUMN "update_at" timestamp with time zone DEFAULT now();
