@@ -9,23 +9,23 @@ import {
 
 export const labels = [
     {
-        value: "c_username",
+        value: "username",
         label: "Username",
     },
     {
-        value: "c_email",
+        value: "email",
         label: "Email",
     },
     {
-        value: "c_fullname",
+        value: "fullname",
         label: "ชื่อ-นามสกุล",
     },
     {
-        value: "c_role",
+        value: "role",
         label: "ระดับ",
     },
     {
-        value: "e_status",
+        value: "status",
         label: "สถานะ",
     },
 ]
@@ -33,17 +33,17 @@ export const labels = [
 export const statuses = [
     {
         value: "active",
-        label: "ปกติ",
+        label: "ออนไลน์",
         icon: CheckCircle,
     },
     {
         value: "inactive",
-        label: "ปิดการใช้",
+        label: "ออฟไลน์",
         icon: PauseCircle,
     },
     {
         value: "delete",
-        label: "ยกเลิก",
+        label: "ปิดการใช้งาน",
         icon: Trash2,
     },
 ];

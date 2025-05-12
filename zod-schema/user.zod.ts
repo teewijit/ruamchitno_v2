@@ -28,6 +28,10 @@ export const loginUserSchema = createInsertSchema(users, {
         .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
 });
 
+export const passwordSchema = z.object({
+    password: z.string().min(4, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
+});
+
 // สร้าง TypeScript types
 export const selectUserSchema = createSelectSchema(users);
 export type SelectUserSchemaType = z.infer<typeof insertUserSchema>;

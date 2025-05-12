@@ -33,7 +33,7 @@ export function SelectWithLabel<S>({
       control={form.control}
       name={nameInSchema}
       render={({ field }) => (
-        <FormItem className={className}>
+        <FormItem className={`w-full ${className}`}>
           <FormLabel className="text-base" htmlFor={nameInSchema}>
             {fieldTitle}
           </FormLabel>
@@ -43,7 +43,7 @@ export function SelectWithLabel<S>({
             disabled={disabled}
           >
             <FormControl>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
             </FormControl>

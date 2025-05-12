@@ -13,7 +13,7 @@ export const users = pgTable("users", {
     l_name: varchar("l_name", { length: 100 }),
     fullname: varchar("fullname", { length: 255 }),
     role: roleEnum("role").default("user").notNull(),
-    status: statusEnum("status").default("active").notNull(),
+    status: statusEnum("status").default("inactive").notNull(),
     create_at: timestamp("create_at", { withTimezone: true }).defaultNow(),
     update_at: timestamp("update_at", { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
 });

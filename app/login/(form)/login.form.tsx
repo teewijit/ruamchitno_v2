@@ -18,20 +18,30 @@ import { InputWithLabel } from "@/components/inputs/input-label"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { loginUserSchema, LoginUserSchemaType } from "@/zod-schema/client/user.client.schema"
+
+const loginSchema = z.object({
+    username: z.string()
+        .min(1, "กรุณากรอกชื่อผู้ใช้")
+        .max(255, "ชื่อผู้ใช้ต้องไม่เกิน 255 ตัวอักษร"),
+    password: z.string()
+        .min(4, "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร")
+        .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
+})
+
+type LoginSchemaType = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
     const router = useRouter();
 
-    const form = useForm<LoginUserSchemaType>({
-        resolver: zodResolver(loginUserSchema),
+    const form = useForm<LoginSchemaType>({
+        resolver: zodResolver(loginSchema),
         defaultValues: {
             username: "",
             password: "",
         },
     })
 
-    function onSubmit(values: LoginUserSchemaType) {
+    function onSubmit(values: LoginSchemaType) {
         signIn("credentials", {
             username: values.username,
             password: values.password,
@@ -54,11 +64,12 @@ export function LoginForm() {
                         <CardTitle className="text-center text-3xl">มูลนิธิร่วมจิตต์น้อมเกล้าฯ</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <InputWithLabel
+                        <InputWithLabel<LoginSchemaType>
                             fieldTitle="Username"
                             nameInSchema="username"
+                            className="mb-3"
                         />
-                        <InputWithLabel
+                        <InputWithLabel<LoginSchemaType>
                             fieldTitle="Password"
                             nameInSchema="password"
                             isPassword

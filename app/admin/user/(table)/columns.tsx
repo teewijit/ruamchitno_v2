@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { Badge } from "@/components//ui/badge"
 import { Actions } from "./actions"
 import { labels, roles, statuses } from "./data"
-import { SelectUserSchemaType } from "@/zod-schema/server/user.server.schema"
+import { SelectUserSchemaType } from "@/zod-schema/user.zod"
 
 export const columns: ColumnDef<SelectUserSchemaType>[] = [ /* ... */]
 
@@ -14,10 +14,12 @@ export function getColumns({
   onView,
   onEdit,
   onDelete,
+  onChangePassword,
 }: {
   onView: (id: string | number) => void
   onEdit: (id: string | number) => void
   onDelete: (id: string | number) => void
+  onChangePassword: (id: string | number) => void
 }): ColumnDef<SelectUserSchemaType>[] {
   return [
     {
@@ -170,6 +172,7 @@ export function getColumns({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          onChangePassword={onChangePassword}
         />
       ),
     },

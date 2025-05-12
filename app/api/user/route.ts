@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { users } from "@/db/schema/user.schema";
-import { count, ilike, or } from "drizzle-orm";
+import { and, count, desc, ilike, ne, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { AuthGuard } from "@/lib/auth-guard";
 import bcrypt from 'bcryptjs'
-import { insertUserSchema } from "@/zod-schema/server/user.server.schema";
+import { insertUserSchema } from "@/zod-schema/user.zod";
+import { logAction } from "@/lib/audit-logs";
 
 async function getHandler(req: NextRequest) {
     try {
-
         const { searchParams } = new URL(req.url);
 
         const search = searchParams.get("search") ?? null;
@@ -25,10 +25,14 @@ async function getHandler(req: NextRequest) {
             )
             : undefined;
 
+        const whereCondition = searchCondition
+            ? and(ne(users.status, 'delete'), searchCondition)
+            : ne(users.status, 'delete');
+
         const [{ count: totalCount }] = await db
             .select({ count: count() })
             .from(users)
-            .where(searchCondition);
+            .where(whereCondition);
 
         const totalPages = Math.ceil(totalCount / totalItems);
         const currentPage = search ? 1 : page;
@@ -37,7 +41,12 @@ async function getHandler(req: NextRequest) {
         const items = await db
             .select()
             .from(users)
-            .where(searchCondition)
+            .where(whereCondition)
+            .orderBy(
+              // เรียงลำดับโดยให้ status = 'active' มาอยู่บนสุด
+              sql`CASE WHEN ${users.status} = 'active' THEN 0 ELSE 1 END`,
+              desc(users.create_at)  // ลำดับรอง: ตามวันที่สร้าง ใหม่ไปเก่า
+            )
             .offset(offset)
             .limit(totalItems);
 
@@ -72,8 +81,15 @@ async function postHandler(req: NextRequest) {
         validData.fullname = fullname;
 
         const result = await db.insert(users).values(validData).returning();
+        const newData = result[0];
 
-        return NextResponse.json(result[0], { status: 201 });
+        await logAction({
+            table: "users",
+            action: "create",
+            recordId: newData.id,
+        });
+
+        return NextResponse.json(newData, { status: 201 });
     } catch (error) {
         console.error("Error creating user:", error);
         return NextResponse.json(

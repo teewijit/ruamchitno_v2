@@ -1,12 +1,9 @@
 import {
-  Tag,
-  Users,
-  Settings,
-  Bookmark,
-  SquarePen,
   LucideIcon,
   UsersIcon,
-  UserCog
+  UserCog,
+  SchoolIcon,
+  Layers2Icon
 } from "lucide-react";
 
 type Submenu = {
@@ -31,65 +28,43 @@ type Group = {
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: "ข้อมูลพื้นฐาน",
       menus: [
-        {
-          href: "/user",
-          label: "ผู้ใช้งาน",
-          icon: UserCog,
-          submenus: []
-        },
         {
           href: "/youth",
           label: "เยาวชน",
           icon: UsersIcon,
-          submenus: []
         },
-      ]
-    },
-    {
-      groupLabel: "Contents",
-      menus: [
+        {
+          href: "/school",
+          label: "โรงเรียน",
+          icon: SchoolIcon,
+        },
         {
           href: "",
-          label: "Posts",
-          icon: SquarePen,
+          label: "กองทุน",
+          icon: Layers2Icon,
           submenus: [
             {
               href: "/posts",
-              label: "All Posts"
+              label: "กองทุนถาวร"
             },
             {
               href: "/posts/new",
-              label: "New Post"
+              label: "กองทุนรายปี"
             }
           ]
         },
-        {
-          href: "/categories",
-          label: "Categories",
-          icon: Bookmark
-        },
-        {
-          href: "/tags",
-          label: "Tags",
-          icon: Tag
-        }
       ]
     },
     {
       groupLabel: "Settings",
       menus: [
         {
-          href: "/users",
-          label: "Users",
-          icon: Users
+          href: "/user",
+          label: "ผู้ใช้งาน",
+          icon: UserCog,
         },
-        {
-          href: "/account",
-          label: "Account",
-          icon: Settings
-        }
       ]
     }
   ];

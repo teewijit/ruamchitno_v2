@@ -17,6 +17,7 @@ export function BackButton(
 
     return (
         <Button
+            type="button"
             variant={variant}
             className={className}
             onClick={() => router.back()}

@@ -32,10 +32,16 @@ export const authOptions: NextAuthOptions = {
                     .where(eq(users.username, username))
                     .then(res => res[0]);
 
-                if (!user || user.status !== 'active') return null;
+                if (!user) return null;
 
                 const isValid = await bcrypt.compare(password, user.password);
-                if (!isValid) return null;
+                if (isValid) {
+                    await db.update(users)
+                        .set({ status: 'active' })
+                        .where(eq(users.id, user.id));
+                } else {
+                    return null
+                };
 
                 return {
                     id: String(user.id),

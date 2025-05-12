@@ -1,5 +1,3 @@
-"use client"
-
 import Link from "next/link";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
@@ -13,6 +11,12 @@ import { Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import UserTable from "./(table)/user-table";
+
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: "ข้อมูลผู้ใช้งาน",
+};
 
 export default function UserPage() {
 
@@ -43,7 +47,7 @@ export default function UserPage() {
             </div>
 
             <Card className="rounded-lg border-none mt-6">
-                <CardContent className="p-6">
+                <CardContent>
                     <UserTable />
                 </CardContent>
             </Card>

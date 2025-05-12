@@ -36,7 +36,7 @@ export function DataTableToolbar<TData>({
         />
         {(isFiltered || (search && search.length > 0)) && (
           <Button
-            variant="default"
+            variant="destructive"
             onClick={() => handleReset()}
             className="h-8 px-2 lg:px-3"
           >

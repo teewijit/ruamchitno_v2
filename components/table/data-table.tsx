@@ -18,6 +18,7 @@ import {
 import { DataTableToolbar } from "./data-table-toolbar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { DataTablePagination } from "./data-table-pagination"
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -42,7 +43,7 @@ export function DataTable<TData, TValue>({
   onSearchChange,
   totalPages,
   currentPage,
-  totalItems, 
+  totalItems,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -108,7 +109,7 @@ export function DataTable<TData, TValue>({
                 <TableRow key={i}>
                   {columns.map((column, index) => (
                     <TableCell key={index}>
-                      <div className="h-8 bg-gray-200 rounded animate-pulse" />
+                      <Skeleton className="h-5 w-24" />
                     </TableCell>
                   ))}
                 </TableRow>

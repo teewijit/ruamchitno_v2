@@ -12,7 +12,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
-import UserTable from "./(table)/user-table";
+import YouthTable from "./(table)/youth-table";
 
 export default function UserPage() {
 
@@ -44,7 +44,7 @@ export default function UserPage() {
 
             <Card className="rounded-lg border-none mt-6">
                 <CardContent className="p-6">
-                    <UserTable />
+                    <YouthTable />
                 </CardContent>
             </Card>
 

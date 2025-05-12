@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table"
-import { Eye, MoreHorizontal, Pen, Trash } from "lucide-react"
+import { Eye, KeySquare, MoreHorizontal, Pen, Trash } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,8 @@ interface ActionsProps<TData> {
   onView?: (id: string | number) => void
   onEdit?: (id: string | number) => void
   onDelete?: (id: string | number) => void
-  idKey?: keyof TData // เผื่อข้อมูลคุณ id ไม่ได้ชื่อ 'id'
+  onChangePassword?: (id: string | number) => void
+  idKey?: keyof TData
 }
 
 export function Actions<TData extends Record<string, any>>({
@@ -22,6 +23,7 @@ export function Actions<TData extends Record<string, any>>({
   onView,
   onEdit,
   onDelete,
+  onChangePassword,
   idKey,
 }: ActionsProps<TData>) {
 
@@ -92,6 +94,22 @@ export function Actions<TData extends Record<string, any>>({
               </TooltipProvider>
             </DropdownMenuItem>
 
+            <DropdownMenuItem
+              onClick={() => onChangePassword?.(id)}
+              className="h-8 w-8 p-0 flex items-center justify-center cursor-pointer"
+            >
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger asChild>
+                    <KeySquare className="text-purple-500 h-4 w-4 hover:scale-110 transition-transform" />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>เปลี่ยนรหัสผ่าน</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </DropdownMenuItem>
+            
           </div>
         </DropdownMenuContent>
       </DropdownMenu>

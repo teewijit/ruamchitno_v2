@@ -7,37 +7,109 @@ import { Form } from "@/components/ui/form";
 import { InputWithLabel } from "@/components/inputs/input-label";
 import { SelectWithLabel } from "@/components/inputs/select-label";
 import { Card, CardContent } from "@/components/ui/card";
-import { roles, statuses } from "../(table)/data";
-import { CheckboxWithStatus } from "@/components/inputs/checkbox-status";
+import { roles } from "../(table)/data";
 import { z } from "zod";
-import { insertUserSchema, InsertUserSchemaType, SelectUserSchemaType } from "@/zod-schema/client/user.client.schema";
-import { updateUserSchema } from "@/zod-schema/server/user.server.schema";
+import { BackButton } from '@/components/ui/back-button';
+import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect } from "react";
 
-const formSchema = z.object({
-    username: z.string(),
-    password: z.string(),
-    email: z.string(),
+const insertSchema = z.object({
+    username: z.string()
+        .min(1, "กรุณากรอกชื่อผู้ใช้")
+        .max(255, "ชื่อผู้ใช้ต้องไม่เกิน 255 ตัวอักษร"),
+    password: z.string()
+        .min(4, "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร")
+        .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
+    email: z.string()
+        .min(1, "กรุณากรอก Email")
+        .email(),
     p_name: z.string(),
     f_name: z.string(),
     l_name: z.string(),
     role: z.string(),
-    status: z.string(),
 })
 
-type FormSchemaType = z.infer<typeof formSchema>;
+const updateSchema = z.object({
+    username: z.string()
+        .min(1, "กรุณากรอกชื่อผู้ใช้")
+        .max(255, "ชื่อผู้ใช้ต้องไม่เกิน 255 ตัวอักษร"),
+    email: z.string()
+        .min(1, "กรุณากรอก Email")
+        .email("กรุณากรอก Email ให้ถูกต้อง"),
+    p_name: z.string(),
+    f_name: z.string(),
+    l_name: z.string(),
+    role: z.string(),
+})
+
+type InsertSchemaType = z.infer<typeof insertSchema>;
+type UpdateSchemaType = z.infer<typeof updateSchema>;
 
 type Props = {
-    user?: SelectUserSchemaType,
-    onSubmit: (data: InsertUserSchemaType) => void,
+    user?: InsertSchemaType | UpdateSchemaType,
     isLoading?: boolean,
     mode: "create" | "edit",
+    onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void
 };
 
-export default function UserForm({ user, onSubmit, isLoading = false, mode }: Props) {
-    const schema = mode === "create" ? insertUserSchema : updateUserSchema;
-    type FormSchemaType = typeof schema extends z.ZodTypeAny ? z.infer<typeof schema> : never;
+const FormSkeleton = () => {
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-2 space-y-2">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
 
-    const form = useForm<FormSchemaType>({
+                <div className="col-span-10 space-y-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-14" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-2 space-y-2">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+
+                <div className="col-span-5 space-y-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+
+                <div className="col-span-5 space-y-2">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+
+            <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-6 w-6" />
+                </div>
+            </div>
+
+            <Skeleton className="h-10 w-full" />
+        </div>
+    )
+}
+
+export default function UserForm({ user, isLoading = false, mode, onSubmit }: Props) {
+    const schema = mode === "create" ? insertSchema : updateSchema;
+
+    const form = useForm<InsertSchemaType | UpdateSchemaType>({
         defaultValues: user ?? {
             username: '',
             password: '',
@@ -46,65 +118,100 @@ export default function UserForm({ user, onSubmit, isLoading = false, mode }: Pr
             f_name: '',
             l_name: '',
             role: 'user',
-            status: 'active',
         },
         resolver: zodResolver(schema),
-        mode: "onBlur"
+        mode: "onChange"
     });
-
-    const handleSubmit = (data: any) => {
-        // remove empty password on edit mode
-        if (mode === "edit" && data.password === "") {
-            delete data.password;
+    useEffect(() => {
+        if (user) {
+            form.reset(user);
+            console.log(user);
+            
         }
-        onSubmit(data);
-    };
+    }, [user]);
+    
+    // เพิ่ม useEffect เพื่ออัพเดตฟอร์มเมื่อ user เปลี่ยนแปลง
+    // useEffect(() => {
+    //     if (user) {
+    //         form.reset(user);
+    //         console.log('user: ', user);
 
+    //     }
+    // }, [user, form]);
+
+    const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
+        onSubmit(data);
+        console.log(data);
+        
+    };
 
     return (
         <Card className="rounded-lg border-none mt-6">
-            <CardContent className="p-6">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                        <InputWithLabel<SelectUserSchemaType> fieldTitle="ชื่อผู้ใช้งาน" nameInSchema="username" disabled={mode === "edit"} />
-                        {mode === "create" && (
-                            <InputWithLabel<SelectUserSchemaType> fieldTitle="รหัสผ่าน" nameInSchema="password" isPassword={true} />
-                        )}
-                        <InputWithLabel<SelectUserSchemaType> fieldTitle="อีเมล" nameInSchema="email" />
+            <CardContent>
+                {isLoading ? (
+                    <FormSkeleton />
+                ) : (
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 
-                        <div className="grid grid-cols-12 gap-4">
-                            <div className="col-span-2">
-                                <InputWithLabel<SelectUserSchemaType>
-                                    fieldTitle="คำนำหน้า"
-                                    nameInSchema="p_name"
-                                />
+                            <div className="grid grid-cols-12 gap-4">
+                                <div className="col-span-12 md:col-span-2">
+                                    <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
+                                        fieldTitle="บทบาท"
+                                        nameInSchema="role"
+                                        data={roles}
+                                    />
+                                </div>
+                                <div className="col-span-12 md:col-span-10">
+                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                        fieldTitle="ชื่อผู้ใช้งาน"
+                                        nameInSchema="username"
+                                    />
+                                </div>
                             </div>
 
-                            <div className="col-span-5">
-                                <InputWithLabel<SelectUserSchemaType>
-                                    fieldTitle="ชื่อจริง"
-                                    nameInSchema="f_name"
-                                />
+                            {mode === "create" && (
+                                <InputWithLabel<InsertSchemaType> fieldTitle="รหัสผ่าน" nameInSchema="password" isPassword={true} />
+                            )}
+                            <InputWithLabel<InsertSchemaType | UpdateSchemaType> fieldTitle="อีเมล" nameInSchema="email" />
+
+                            <div className="grid grid-cols-12 gap-4">
+                                <div className="col-span-4 md:col-span-2">
+                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                        fieldTitle="คำนำหน้า"
+                                        nameInSchema="p_name"
+                                    />
+                                </div>
+
+                                <div className="col-span-8 md:col-span-5">
+                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                        fieldTitle="ชื่อจริง"
+                                        nameInSchema="f_name"
+                                    />
+                                </div>
+
+                                <div className="col-span-12 md:col-span-5">
+                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                        fieldTitle="นามสกุล"
+                                        nameInSchema="l_name"
+                                    />
+                                </div>
                             </div>
 
-                            <div className="col-span-5">
-                                <InputWithLabel<SelectUserSchemaType>
-                                    fieldTitle="นามสกุล"
-                                    nameInSchema="l_name"
-                                />
+                            <div className="flex justify-between items-center">
+                                <BackButton title="ย้อนกลับ" variant={"outline"} />
+                                <Button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    variant={"default"}
+                                >
+                                    {isLoading
+                                        ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+                                </Button>
                             </div>
-                        </div>
-
-                        <SelectWithLabel<SelectUserSchemaType> fieldTitle="บทบาท" nameInSchema="role" data={roles} />
-                        <div className="grid grid-cols-4 gap-4">
-                            <CheckboxWithStatus<SelectUserSchemaType> fieldTitle="สถานะ" nameInSchema="status" message="ใช้งาน" />
-                        </div>
-                        <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white hover:bg-blue-700">
-                            {isLoading ? (mode === "create" ? 'กำลังบันทึก...' : 'กำลังอัปเดต...')
-                                : (mode === "create" ? 'บันทึกข้อมูล' : 'อัปเดตข้อมูล')}
-                        </Button>
-                    </form>
-                </Form>
+                        </form>
+                    </Form>
+                )}
             </CardContent>
         </Card>
     )

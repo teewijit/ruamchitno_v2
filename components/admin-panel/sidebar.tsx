@@ -44,7 +44,7 @@ export function Sidebar() {
                   : "translate-x-0 opacity-100"
               )}
             >
-              Brand
+              มูลนิธิร่วมจิตต์น้อมเกล้าฯ
             </h1>
           </Link>
         </Button>

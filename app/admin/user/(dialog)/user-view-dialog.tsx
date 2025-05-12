@@ -1,63 +1,117 @@
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { DateTime } from "luxon";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CardContent } from "@/components/ui/card";
+import useSWR from "swr";
 
 interface ViewDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    viewData: any;
+    viewId: string | number;
 }
 
-export const UserViewDialog: React.FC<ViewDialogProps> = ({ isOpen, onClose, viewData }) => {
-    const [historyData, setHistoryData] = useState<any>(null);  // เก็บข้อมูลประวัติ
-    const [loading, setLoading] = useState<boolean>(false);  // ใช้สำหรับเช็คสถานะการโหลด
+interface AuditLog {
+    id: number;
+    table: string;
+    action: string;
+    recordId: number;
+    performedAt: string;
+    performedBy: {
+        id: number;
+        name: string;
+        email: string;
+    };
+}
 
-    useEffect(() => {
-        const fetchHistory = async () => {
-            if (viewData && viewData.id) {
-                setLoading(true);  // เริ่มการโหลดข้อมูล
-                try {
-                    const data = {};  // เรียก getHistory
-                    setHistoryData(data);  // เก็บข้อมูลที่ได้
-                } catch (error) {
-                    console.error("Error fetching history:", error);
-                } finally {
-                    setLoading(false);  // การโหลดเสร็จสิ้น
-                }
-            }
-        };
+const FormSkeleton = () => {
+    return (
+        <div className="space-y-6">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+        </div>
+    )
+}
 
-        if (isOpen) {  // ดึงข้อมูลเมื่อ dialog เปิด
-            fetchHistory();
-        }
-    }, [isOpen, viewData]);  // เมื่อ isOpen หรือ viewData เปลี่ยนแปลง
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export const UserViewDialog: React.FC<ViewDialogProps> = ({
+    isOpen,
+    onClose,
+    viewId,
+}) => {
+
+    const { data, isLoading } = useSWR(
+        viewId != 0 ? `/api/audit-logs/user/${viewId}` : null,
+        fetcher
+    );
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>View Profile</DialogTitle>
+                    <DialogTitle>ประวัติการเปลี่ยนแปลง</DialogTitle>
                     <DialogDescription>
-                        ดูข้อมูลของผู้ใช้ที่เลือก
+                        แสดงรายการที่มีการกระทำกับผู้ใช้นี้
                     </DialogDescription>
                 </DialogHeader>
-                <div className="py-4">
-                    {loading ? (
-                        <p>กำลังโหลดข้อมูล...</p>  // ขณะโหลดข้อมูล
-                    ) : historyData ? (
-                        <div>
-                            <p>ข้อมูลของผู้ใช้ ID: {viewData.id}</p>
-                            <p>สร้างโดย: {historyData.items[0].create_by}</p>
-                            <p>อัพเดทโดย: {historyData.items[0].update_by}</p>
-                            <p>สร้างเมื่อ: {historyData.items[0].create_at}</p>
-                            <p>อัพเดทเมื่อ: {historyData.items[0].update_at}</p>
-                        </div>
-                    ) : (
-                        <p>ไม่พบข้อมูลประวัติ</p>
-                    )}
-                </div>
+
+                <ScrollArea className="">
+
+                    <div className="max-h-[250px] overflow-y-auto">
+                        {isLoading ? (
+                            <FormSkeleton />
+                        ) : data && data.length > 0 ? (
+                            <>
+                                {data.map((log: AuditLog) => (
+                                    <CardContent key={log.id} className="border rounded p-5 mb-3 me-2">
+                                        <p className="text-sm">
+                                            <strong>Action : </strong>{" "}
+                                            <Badge
+                                                className={`${log.action === "create"
+                                                    ? "bg-blue-500"
+                                                    : log.action === "update"
+                                                        ? "bg-yellow-500"
+                                                        : log.action === "delete"
+                                                            ? "bg-red-500"
+                                                            : ""
+                                                    }`}
+                                            >
+                                                {log.action.toUpperCase()}
+                                            </Badge>
+                                        </p>
+                                        <p className="text-sm">
+                                            <strong>โดย : </strong> {log.performedBy.name}
+                                        </p>
+                                        <p className="text-sm">
+                                            <strong>เวลา : </strong>{" "}
+                                            {DateTime.fromISO(log.performedAt)
+                                                .setLocale("th")
+                                                .toFormat("dd LLL yyyy เวลา HH:mm")}{" "}
+                                             น.
+                                        </p>
+                                    </CardContent>
+                                ))}
+                            </>
+                        ) : (
+                            <p>ไม่พบข้อมูลประวัติ</p>
+                        )}
+                    </div>
+                </ScrollArea>
+
                 <DialogFooter>
-                    <Button type="button" onClick={onClose}>Close</Button>
+                    <Button type="button" onClick={onClose}>
+                        ปิด
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

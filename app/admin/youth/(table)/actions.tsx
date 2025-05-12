@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table"
-import { Eye, MoreHorizontal, Pen, Trash } from "lucide-react"
+import { Eye, KeySquare, MoreHorizontal, Pen, Trash } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ interface ActionsProps<TData> {
   onView?: (id: string | number) => void
   onEdit?: (id: string | number) => void
   onDelete?: (id: string | number) => void
-  idKey?: keyof TData // เผื่อข้อมูลคุณ id ไม่ได้ชื่อ 'id'
+  idKey?: keyof TData
 }
 
 export function Actions<TData extends Record<string, any>>({

@@ -1,31 +1,24 @@
 import {
-    User, 
-    UserCog, 
-    Briefcase, 
-    CheckCircle, 
-    PauseCircle, 
+    CheckCircle,
+    PauseCircle,
     Trash2
 } from "lucide-react"
 
 export const labels = [
     {
-        value: "c_username",
-        label: "Username",
-    },
-    {
-        value: "c_email",
-        label: "Email",
-    },
-    {
-        value: "c_fullname",
+        value: "fullname",
         label: "ชื่อ-นามสกุล",
     },
     {
-        value: "c_role",
-        label: "ระดับ",
+        value: "full_address",
+        label: "ที่อยู่",
     },
     {
-        value: "e_status",
+        value: "remark",
+        label: "รายละเอียด",
+    },
+    {
+        value: "status",
         label: "สถานะ",
     },
 ]
@@ -38,30 +31,12 @@ export const statuses = [
     },
     {
         value: "inactive",
-        label: "ปิดการใช้",
+        label: "ปิดการใช้งาน",
         icon: PauseCircle,
     },
     {
         value: "delete",
-        label: "ยกเลิก",
+        label: "ลบ",
         icon: Trash2,
-    },
-];
-
-export const roles = [
-    {
-        value: "user",
-        label: "User",
-        icon: User,
-    },
-    {
-        value: "admin",
-        label: "Admin",
-        icon: UserCog,
-    },
-    {
-        value: "manager",
-        label: "Manager",
-        icon: Briefcase,
     },
 ];
