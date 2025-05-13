@@ -12,12 +12,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Card, CardContent } from "@/components/ui/card";
 import UserTable from "./(table)/user-table";
 
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-    title: "ข้อมูลผู้ใช้งาน",
-};
-
 export default function UserPage() {
 
     return (

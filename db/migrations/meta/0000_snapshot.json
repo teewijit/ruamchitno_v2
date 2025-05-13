@@ -1,5 +1,5 @@
 {
-  "id": "6eb71443-f049-429d-b545-0d97542af998",
+  "id": "8979add1-853a-4a5b-b875-40229fcc045f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -53,7 +53,7 @@
         },
         "action": {
           "name": "action",
-          "type": "action",
+          "type": "action_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -110,7 +110,7 @@
         },
         "class_level": {
           "name": "class_level",
-          "type": "classLevel",
+          "type": "classLevel_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -166,6 +166,20 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'0.00'"
+        },
+        "create_at": {
+          "name": "create_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "update_at": {
+          "name": "update_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -208,7 +222,7 @@
         },
         "fund_type": {
           "name": "fund_type",
-          "type": "fundType",
+          "type": "fundType_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -291,7 +305,7 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -326,6 +340,121 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.amphoes": {
+      "name": "amphoes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "province_id": {
+          "name": "province_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "amphoes_province_id_provinces_id_fk": {
+          "name": "amphoes_province_id_provinces_id_fk",
+          "tableFrom": "amphoes",
+          "tableTo": "provinces",
+          "columnsFrom": [
+            "province_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.provinces": {
+      "name": "provinces",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tambons": {
+      "name": "tambons",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amphoe_id": {
+          "name": "amphoe_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tambons_amphoe_id_amphoes_id_fk": {
+          "name": "tambons_amphoe_id_amphoes_id_fk",
+          "tableFrom": "tambons",
+          "tableTo": "amphoes",
+          "columnsFrom": [
+            "amphoe_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -404,7 +533,7 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -501,7 +630,7 @@
         },
         "role": {
           "name": "role",
-          "type": "role",
+          "type": "role_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -509,11 +638,11 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'active'"
+          "default": "'inactive'"
         },
         "create_at": {
           "name": "create_at",
@@ -610,7 +739,7 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -700,7 +829,8 @@
           "name": "citizen_id",
           "type": "varchar(20)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'-'"
         },
         "email": {
           "name": "email",
@@ -746,19 +876,34 @@
         },
         "tambon": {
           "name": "tambon",
-          "type": "varchar(255)",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
         "amphoe": {
           "name": "amphoe",
-          "type": "varchar(255)",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
         "province": {
           "name": "province",
-          "type": "varchar(255)",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "zip_code": {
+          "name": "zip_code",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "full_address": {
+          "name": "full_address",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -772,7 +917,8 @@
           "name": "class_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
         "remark": {
           "name": "remark",
@@ -782,7 +928,7 @@
         },
         "status": {
           "name": "status",
-          "type": "status",
+          "type": "status_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -805,6 +951,45 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "youths_tambon_tambons_id_fk": {
+          "name": "youths_tambon_tambons_id_fk",
+          "tableFrom": "youths",
+          "tableTo": "tambons",
+          "columnsFrom": [
+            "tambon"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "youths_amphoe_amphoes_id_fk": {
+          "name": "youths_amphoe_amphoes_id_fk",
+          "tableFrom": "youths",
+          "tableTo": "amphoes",
+          "columnsFrom": [
+            "amphoe"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "youths_province_provinces_id_fk": {
+          "name": "youths_province_provinces_id_fk",
+          "tableFrom": "youths",
+          "tableTo": "provinces",
+          "columnsFrom": [
+            "province"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "youths_class_id_classes_id_fk": {
           "name": "youths_class_id_classes_id_fk",
           "tableFrom": "youths",
@@ -827,8 +1012,8 @@
     }
   },
   "enums": {
-    "public.action": {
-      "name": "action",
+    "public.action_enum": {
+      "name": "action_enum",
       "schema": "public",
       "values": [
         "create",
@@ -836,8 +1021,8 @@
         "delete"
       ]
     },
-    "public.classLevel": {
-      "name": "classLevel",
+    "public.classLevel_enum": {
+      "name": "classLevel_enum",
       "schema": "public",
       "values": [
         "ปฐมวัย",
@@ -851,8 +1036,8 @@
         "การศึกษานอกระบบ"
       ]
     },
-    "public.fundType": {
-      "name": "fundType",
+    "public.fundType_enum": {
+      "name": "fundType_enum",
       "schema": "public",
       "values": [
         "กองทุนถาวร",
@@ -862,8 +1047,8 @@
         "กิจกรรม"
       ]
     },
-    "public.role": {
-      "name": "role",
+    "public.role_enum": {
+      "name": "role_enum",
       "schema": "public",
       "values": [
         "user",
@@ -871,8 +1056,8 @@
         "manager"
       ]
     },
-    "public.status": {
-      "name": "status",
+    "public.status_enum": {
+      "name": "status_enum",
       "schema": "public",
       "values": [
         "active",

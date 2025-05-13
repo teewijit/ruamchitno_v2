@@ -30,7 +30,7 @@ export default function UserPage() {
                 <TooltipProvider>
                     <Tooltip delayDuration={100}>
                         <TooltipTrigger>
-                            <Link href="/user/form" className={buttonVariants({ variant: "outline", size: 'icon' })}>
+                            <Link href="youth/form" className={buttonVariants({ variant: "outline", size: 'icon' })}>
                                 <Plus />
                             </Link>
                         </TooltipTrigger>

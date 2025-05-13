@@ -29,7 +29,7 @@ export const loginUserSchema = createInsertSchema(users, {
 });
 
 export const passwordSchema = z.object({
-    password: z.string().min(4, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
+    password: z.string().min(4, "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร"),
 });
 
 // สร้าง TypeScript types
@@ -38,3 +38,4 @@ export type SelectUserSchemaType = z.infer<typeof insertUserSchema>;
 export type InsertUserSchemaType = z.infer<typeof insertUserSchema>;
 export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>;
 export type LoginUserSchemaType = z.infer<typeof loginUserSchema>;
+export type PasswordSchemaSchemaType = z.infer<typeof passwordSchema>;

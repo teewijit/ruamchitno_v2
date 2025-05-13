@@ -41,7 +41,7 @@ export default function ChangePasswordForm({ data, isLoading = false, onSubmit, 
             password: "",
             confirmPassword: "",
         },
-        mode: "onChange"
+        mode: "onBlur"
     });
 
     useEffect(() => {

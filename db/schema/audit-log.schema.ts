@@ -1,6 +1,5 @@
-import { integer, pgEnum, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
-
-export const actionEnum = pgEnum('action', ['create', 'update', 'delete']);
+import { integer, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { actionEnum } from "./enums.schema";
 
 export const auditLogs = pgTable("audit_logs", {
     id: serial("id").primaryKey(),

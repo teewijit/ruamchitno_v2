@@ -65,7 +65,7 @@ export const UserViewDialog: React.FC<ViewDialogProps> = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="">
+                <ScrollArea>
 
                     <div className="max-h-[250px] overflow-y-auto">
                         {isLoading ? (

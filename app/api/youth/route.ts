@@ -16,11 +16,17 @@ export const GET = AuthGuard(async (req: NextRequest) => {
 
         const searchCondition = search
             ? or(
-                ilike(youths.email, `%${search}%`),
                 ilike(youths.p_name, `%${search}%`),
                 ilike(youths.f_name, `%${search}%`),
                 ilike(youths.l_name, `%${search}%`),
-                ilike(classes.short_name, `%${search}%`)  // เพิ่มการค้นหาจาก `classes.short_name`
+                ilike(classes.short_name, `%${search}%`),
+                ilike(youths.address, `%${search}%`),
+                ilike(youths.tambon, `%${search}%`),
+                ilike(youths.amphoe, `%${search}%`),
+                ilike(youths.province, `%${search}%`),
+                ilike(youths.zip_code, `%${search}%`),
+                ilike(youths.year_start, `%${search}%`),
+                ilike(youths.remark, `%${search}%`),
             )
             : undefined;
 

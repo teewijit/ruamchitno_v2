@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema/user.schema";
 import { AuthGuard } from "@/lib/auth-guard";
 import bcrypt from 'bcryptjs'
-import { passwordSchema } from "@/zod-schema/user.schema";
+import { passwordSchema } from "@/zod-schema/user.zod";
 
 export async function patchHandler(
     req: NextRequest,

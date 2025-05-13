@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { youths } from '@/db/schema';
+import { youths } from '@/db/schema/youth.schema';
 
 export const insertYouthSchema = createInsertSchema(youths, {
     f_name: z.string()
@@ -11,12 +11,12 @@ export const insertYouthSchema = createInsertSchema(youths, {
         .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
 });
 
-export const updateUserSchema = createInsertSchema(youths)
+export const updateYouthSchema = createInsertSchema(youths)
     .partial()
-    .required({ id: true }) 
+    .required({ id: true })
 
 
-export const selectUserSchema = createSelectSchema(youths);
+export const selectYouthSchema = createSelectSchema(youths);
 export type SelectYouthSchemaType = z.infer<typeof insertYouthSchema>;
 export type InsertYouthSchemaType = z.infer<typeof insertYouthSchema>;
-export type UpdateUserSchemaType = z.infer<typeof updateUserSchema>;
+export type UpdateYouthSchemaType = z.infer<typeof updateYouthSchema>;

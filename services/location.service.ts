@@ -1,0 +1,38 @@
+import provinces from '@/lib/thailand-province-data/provinces.json';
+import amphoes from '@/lib/thailand-province-data/amphoes.json';
+import tambons from '@/lib/thailand-province-data/tambons.json';
+
+export type LocationOption = {
+  value: number;
+  label: string;
+};
+
+export const getAllProvinces = (): LocationOption[] => {
+  return provinces.map((p) => ({
+    value: p.id,
+    label: p.name_th,
+  }));
+};
+
+export const getAmphoesByProvinceId = (provinceId: number): LocationOption[] => {
+  return amphoes
+    .filter((a) => a.province_id === provinceId)
+    .map((a) => ({
+      value: a.id,
+      label: a.name_th,
+    }));
+};
+
+export const getTambonsByAmphoeId = (amphoeId: number): LocationOption[] => {
+  return tambons
+    .filter((t) => t.amphoe_id === amphoeId)
+    .map((t) => ({
+      value: t.id,
+      label: t.name_th,
+    }));
+};
+
+export const getZipCodeByTambonId = (tambonId: number): string | null => {
+  const tambon = tambons.find((t) => t.id === tambonId);
+  return tambon?.zip_code?.toString() ?? null;
+};

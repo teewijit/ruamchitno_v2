@@ -7,11 +7,11 @@ import { Form } from "@/components/ui/form";
 import { InputWithLabel } from "@/components/inputs/input-label";
 import { SelectWithLabel } from "@/components/inputs/select-label";
 import { Card, CardContent } from "@/components/ui/card";
-import { roles } from "../(table)/data";
 import { z } from "zod";
 import { BackButton } from '@/components/ui/back-button';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect } from "react";
+import { roles } from "@/components/table/data";
 
 const insertSchema = z.object({
     username: z.string()
@@ -22,7 +22,7 @@ const insertSchema = z.object({
         .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
     email: z.string()
         .min(1, "กรุณากรอก Email")
-        .email(),
+        .email("กรุณากรอก Email ให้ถูกต้อง"),
     p_name: z.string(),
     f_name: z.string(),
     l_name: z.string(),
@@ -122,6 +122,7 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit }: Pr
         resolver: zodResolver(schema),
         mode: "onChange"
     });
+
     useEffect(() => {
         if (user) {
             form.reset(user);
@@ -129,20 +130,9 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit }: Pr
             
         }
     }, [user]);
-    
-    // เพิ่ม useEffect เพื่ออัพเดตฟอร์มเมื่อ user เปลี่ยนแปลง
-    // useEffect(() => {
-    //     if (user) {
-    //         form.reset(user);
-    //         console.log('user: ', user);
-
-    //     }
-    // }, [user, form]);
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
         onSubmit(data);
-        console.log(data);
-        
     };
 
     return (

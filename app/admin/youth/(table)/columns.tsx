@@ -4,7 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header"
 import { Badge } from "@/components//ui/badge"
 import { Actions } from "./actions"
-import { labels } from "./data"
+import { labels } from "@/components/table/data"
+import { Checkbox } from "@/components/ui/checkbox"
 
 type YouthWithClass = {
   id: number
@@ -28,6 +29,30 @@ export function getColumns({
   onDelete: (id: string | number) => void
 }): ColumnDef<YouthWithClass>[] {
   return [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value: any) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="translate-y-[2px]"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value: any) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: "full_name",
       header: ({ column }) => (
@@ -99,7 +124,6 @@ export function getColumns({
           </div>
         )
       },
-      enableSorting: false,
     },
     {
       accessorKey: "remark",

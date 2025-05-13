@@ -5,8 +5,8 @@ import { Checkbox } from "@/components//ui/checkbox"
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header"
 import { Badge } from "@/components//ui/badge"
 import { Actions } from "./actions"
-import { labels, roles, statuses } from "./data"
 import { SelectUserSchemaType } from "@/zod-schema/user.zod"
+import { labels, roles, statuses } from "@/components/table/data"
 
 export const columns: ColumnDef<SelectUserSchemaType>[] = [ /* ... */]
 

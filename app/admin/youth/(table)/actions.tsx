@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table"
-import { Eye, KeySquare, MoreHorizontal, Pen, Trash } from "lucide-react"
+import { Eye, MoreHorizontal, Pen, Trash } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,7 @@ export function Actions<TData extends Record<string, any>>({
   const id = row.original[key] as string | number;
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 justify-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 
 export const labels = [
+    //users
     {
         value: "username",
         label: "Username",
@@ -27,6 +28,28 @@ export const labels = [
     {
         value: "status",
         label: "สถานะ",
+    },
+
+    //youths
+    {
+        value: "full_name",
+        label: "ชื่อ-นามสกุล",
+    },
+    {
+        value: "full_address",
+        label: "ที่อยู่",
+    },
+    {
+        value: "year_start",
+        label: "ปีที่เริ่ม",
+    },
+    {
+        value: "short_name",
+        label: "ชั้นที่เริ่ม",
+    },
+    {
+        value: "remark",
+        label: "รายละเอียด",
     },
 ]
 

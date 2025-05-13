@@ -5,7 +5,7 @@ import { Table } from "@tanstack/react-table"
 import { Settings2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
-import { labels } from "@/app/admin/user/(table)/data"
+import { labels } from "./data"
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>

@@ -30,7 +30,7 @@ export default function YouthTable() {
     }).toString();
 
     // query data
-    const { data: users = { items: [], totalPages: 1 }, isLoading, error, mutate } = useSWR(
+    const { data: youths = { items: [], totalPages: 1 }, isLoading, error, mutate } = useSWR(
         `/api/youth?${queryString}`,
         fetcher
     );
@@ -125,11 +125,11 @@ export default function YouthTable() {
         <>
             <DataTable
                 columns={columns}
-                data={users.items}
+                data={youths.items}
                 isLoading={isLoading}
                 search={search}
                 onSearchChange={setCurrentSearch}
-                totalPages={users.totalPages}
+                totalPages={youths.totalPages}
                 currentPage={page}
                 onPageChange={setPageParam}
                 totalItems={totalItems}
