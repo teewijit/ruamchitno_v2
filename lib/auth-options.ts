@@ -23,9 +23,15 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
 
                 const result = loginSchema.safeParse(credentials);
-                
+
                 if (!result.success) return null;
-                console.log(result);
+
+                try {
+                    const result = await db.execute("SELECT 1");
+                    console.log("DB Connection Success:", result);
+                } catch (error) {
+                    console.error("DB Connection Error:", error);
+                }
 
                 const { username, password } = result.data;
 
