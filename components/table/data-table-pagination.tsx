@@ -18,6 +18,7 @@ interface DataTablePaginationProps<TData> {
   table: Table<TData>
   totalPages: number
   currentPage: number
+  selected?: boolean 
   onPageChange: (page: number) => void
   onTotalItemsChange?: (totalItems: number) => void
 }
@@ -27,6 +28,7 @@ export function DataTablePagination<TData>({
   onPageChange,
   totalPages,
   currentPage,
+  selected = false,
   onTotalItemsChange,
 }: DataTablePaginationProps<TData>) {
 
@@ -43,10 +45,14 @@ export function DataTablePagination<TData>({
 
   return (
     <div className="flex items-center justify-between px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
-        เลือก {table.getFilteredSelectedRowModel().rows.length} จาก{" "}
-        {table.getFilteredRowModel().rows.length} รายการ
-      </div>
+      {/* แก้ไข syntax การแสดง selected */}
+      {selected && (
+        <div className="flex-1 text-sm text-muted-foreground">
+          เลือก {table.getFilteredSelectedRowModel().rows.length} จาก{" "}
+          {table.getFilteredRowModel().rows.length} รายการ
+        </div>
+      )}
+      
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">แสดงต่อหน้า</p>
@@ -59,7 +65,7 @@ export function DataTablePagination<TData>({
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={`${table.getState().pagination.pageSize}`} />
             </SelectTrigger>
-            <SelectContent side="top">
+            <SelectContent side="bottom">
               {[5, 10, 20, 30, 40, 50].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
@@ -68,6 +74,9 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           หน้า {currentPage > totalPages ? 1 : currentPage} จาก {totalPages}
         </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react"; 
+import { useSession } from "next-auth/react";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -26,16 +26,11 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
-  
+
   const { data: session } = useSession();  // ใช้ useSession เพื่อนำข้อมูล session มา
   const userId = session?.user?.id;  // ดึง userId จาก session หากมี
 
   async function onSignOut() {
-    if (!userId) {
-      console.error('No user ID found');
-      return;
-    }
-
     try {
       const savePromise = fetch(`/api/user/${userId}`, {
         method: "PATCH",
@@ -97,8 +92,8 @@ export function Menu({ isOpen }: MenuProps) {
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>
                             <Button
-                              variant={ 
-                                (active === undefined && 
+                              variant={
+                                (active === undefined &&
                                   pathname.startsWith(href)) ||
                                   active
                                   ? "secondary"

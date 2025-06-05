@@ -1,24 +1,18 @@
 import { Metadata } from "next";
-import { LoginForm } from "./(form)/login.form";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth-options";
+import UserFormLoginPage from "./(form)/user-login-form";
 
 export const metadata: Metadata = {
-  title: "เข้าสู่ระบบ",
-  description: "ระบบหลังบ้านสำหรับผู้ดูแลมูลนิธิร่วมจิตต์น้อมเกล้าฯ",
+    title: {
+        template: 'เข้าสู่ระบบ | มูลนิธิร่วมจิตต์น้อมเกล้าฯ',
+        default: 'มูลนิธิร่วมจิตต์น้อมเกล้าฯ',
+    },
 };
 
-export default async function LoginPage() {
-  const session = await getServerSession(authOptions);
+export default function LoginPage() {
 
-  if (session) {
-    redirect("/admin/user");
-  }
-
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <LoginForm />
-    </div>
-  );
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <UserFormLoginPage></UserFormLoginPage>
+        </div>
+    )
 }

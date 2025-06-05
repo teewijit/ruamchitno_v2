@@ -18,7 +18,7 @@ export const labels = [
         label: "Email",
     },
     {
-        value: "fullname",
+        value: "full_name",
         label: "ชื่อ-นามสกุล",
     },
     {

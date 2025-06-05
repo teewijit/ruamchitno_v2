@@ -3,9 +3,10 @@
 import { ButtonHTMLAttributes } from "react"
 import { Button } from "./button"
 import { useRouter } from "next/navigation"
+import { ChevronLeft } from "lucide-react"
 
 type Props = {
-    title: string,
+    title?: string,
     className?: string,
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined,
 } & ButtonHTMLAttributes<HTMLButtonElement>
@@ -21,6 +22,6 @@ export function BackButton(
             variant={variant}
             className={className}
             onClick={() => router.back()}
-        >{title}</Button>
+        ><ChevronLeft /> {title}</Button>
     )
 }

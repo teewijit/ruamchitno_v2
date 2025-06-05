@@ -9,14 +9,8 @@ import { SelectWithLabel } from "@/components/inputs/select-label";
 import { Card, CardContent } from "@/components/ui/card";
 import { z } from "zod";
 import { BackButton } from '@/components/ui/back-button';
-import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { TextAreaWithLabel } from "@/components/inputs/input-textarea";
-
-import provincesData from '@/lib/thailand-province-data/provinces.json'
-import amphoesData from '@/lib/thailand-province-data/amphoes.json'
-import tambonsData from '@/lib/thailand-province-data/tambons.json'
-
 import { SelectWithSearch } from "@/components/inputs/select-search";
 
 import {
@@ -24,7 +18,9 @@ import {
     getAmphoesByProvinceId,
     getTambonsByAmphoeId,
     getZipCodeByTambonId,
-  } from '@/services/location.service';
+} from '@/services/location.service';
+import Loading from "./loading";
+import { optionsTitle } from "@/lib/titles";
 
 type Option = {
     value: number;
@@ -46,7 +42,7 @@ const insertSchema = z.object({
         .regex(/^\d{5}$/, "รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก")
         .optional(),
     year_start: z.string().optional(),
-    class_id: z.number().optional(),
+    class_id: z.coerce.number().optional(),
     remark: z.string().optional(),
     status: z.enum(["active", "inactive"]).default("active").optional(),
 });
@@ -60,45 +56,9 @@ type Props = {
     youth?: InsertSchemaType | UpdateSchemaType,
     isLoading?: boolean,
     mode: "create" | "edit",
-    classes?: { id: number, short_name: string }[], // Provide list of classes
+    classes?: { id: number, short_name: string }[],
     onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void
 };
-
-const FormSkeleton = () => {
-    return (
-        <div className="space-y-6">
-            {/* Similar skeleton structure as before, but with more fields */}
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 md:col-span-6 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="col-span-12 md:col-span-6 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-            </div>
-
-            {/* More skeleton placeholders for additional fields */}
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 md:col-span-4 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="col-span-12 md:col-span-4 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="col-span-12 md:col-span-4 space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-            </div>
-
-            <Skeleton className="h-10 w-full" />
-        </div>
-    )
-}
 
 export default function YouthForm({
     youth,
@@ -138,21 +98,18 @@ export default function YouthForm({
     }, [youth]);
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
-        console.log(data);
-
-        // onSubmit(data);
+        onSubmit(data);
     };
+
     const [selectedProvince, setSelectedProvince] = useState<number>(0);
     const [selectedAmphoe, setSelectedAmphoe] = useState<number>(0);
-
     const [optionsProvince, setOptionsProvince] = useState<Option[]>([]);
     const [optionsAmphoe, setOptionsAmphoe] = useState<Option[]>([]);
     const [optionsTambon, setOptionsTambon] = useState<Option[]>([]);
 
     // ฟังก์ชันที่จะถูกเรียกเมื่อเลือกจังหวัด
     function onChangeProvince(selected: Option | undefined) {
-        console.log(selected);
-        
+
         if (selected) {
             setSelectedProvince(selected.value);
             // รีเซ็ตค่าอำเภอและตำบลเมื่อเปลี่ยนจังหวัด
@@ -179,19 +136,13 @@ export default function YouthForm({
     // ฟังก์ชันที่จะถูกเรียกเมื่อเลือกตำบลแล้วจะใส่ zip_code อัติโนมัต
     function onChangeTambon(selected: Option | undefined) {
         if (selected) {
-            // ค้นหารหัสไปรษณีย์จากข้อมูลตำบล
-            const selectedTambonData = tambonsData.find(item => item.id === selected.value);
-            if (selectedTambonData && selectedTambonData.zip_code) {
-                form.setValue("zip_code", selectedTambonData.zip_code.toString());
-            }
+            form.setValue("zip_code", getZipCodeByTambonId(selected.value));
         }
     }
 
     // โหลดข้อมูลจังหวัดเมื่อ component ถูกโหลด
     useEffect(() => {
         const optsProvince: Option[] = getAllProvinces();
-        console.log(optsProvince);
-        
         setOptionsProvince(optsProvince);
     }, []);
 
@@ -221,7 +172,7 @@ export default function YouthForm({
         <Card className="rounded-lg border-none mt-6">
             <CardContent>
                 {isLoading ? (
-                    <FormSkeleton />
+                    <Loading />
                 ) : (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -247,13 +198,13 @@ export default function YouthForm({
                                     />
                                 </div>
                                 <div className="col-span-12 md:col-span-2">
-                                    <SelectWithLabel
+                                    <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
                                         fieldTitle="ชั้นที่เริ่ม"
                                         nameInSchema="class_id"
                                         placeholder="เลือกชั้นเรียน"
                                         data={
                                             classes.map(cls => ({
-                                                value: cls.id.toString(),
+                                                value: String(cls.id),
                                                 label: cls.short_name
                                             }))
                                         }
@@ -263,10 +214,12 @@ export default function YouthForm({
 
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-4 md:col-span-2">
-                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
                                         fieldTitle="คำนำหน้า"
                                         nameInSchema="p_name"
-                                    />
+                                        placeholder="เลือกคำนำหน้า"
+                                        data={optionsTitle}
+                                    ></SelectWithLabel>
                                 </div>
 
                                 <div className="col-span-8 md:col-span-5">
@@ -296,6 +249,7 @@ export default function YouthForm({
                                     <SelectWithSearch<InsertSchemaType | UpdateSchemaType>
                                         fieldTitle="จังหวัด"
                                         nameInSchema="province"
+                                        placeholder="เลือกจังหวัด"
                                         data={optionsProvince}
                                         onChange={onChangeProvince}
                                     />

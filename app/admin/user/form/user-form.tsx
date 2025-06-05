@@ -9,9 +9,9 @@ import { SelectWithLabel } from "@/components/inputs/select-label";
 import { Card, CardContent } from "@/components/ui/card";
 import { z } from "zod";
 import { BackButton } from '@/components/ui/back-button';
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { roles } from "@/components/table/data";
+import Loading from "./loading";
 
 const insertSchema = z.object({
     username: z.string()
@@ -52,94 +52,56 @@ type Props = {
     onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void
 };
 
-const FormSkeleton = () => {
-    return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-2 space-y-2">
-                    <Skeleton className="h-5 w-20" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-
-                <div className="col-span-10 space-y-2">
-                    <Skeleton className="h-5 w-16" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <Skeleton className="h-5 w-14" />
-                <Skeleton className="h-10 w-full" />
-            </div>
-
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-2 space-y-2">
-                    <Skeleton className="h-5 w-20" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-
-                <div className="col-span-5 space-y-2">
-                    <Skeleton className="h-5 w-16" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-
-                <div className="col-span-5 space-y-2">
-                    <Skeleton className="h-5 w-20" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-            </div>
-
-            <div className="space-y-2">
-                <Skeleton className="h-5 w-16" />
-                <Skeleton className="h-10 w-full" />
-            </div>
-
-            <div className="grid grid-cols-4 gap-4">
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-16" />
-                    <Skeleton className="h-6 w-6" />
-                </div>
-            </div>
-
-            <Skeleton className="h-10 w-full" />
-        </div>
-    )
-}
-
 export default function UserForm({ user, isLoading = false, mode, onSubmit }: Props) {
     const schema = mode === "create" ? insertSchema : updateSchema;
+    const [originalData, setOriginalData] = useState<InsertSchemaType | UpdateSchemaType | null>(null);
+
+    const defaultValues = user ?? {
+        username: '',
+        password: '',
+        email: '',
+        p_name: '',
+        f_name: '',
+        l_name: '',
+        role: 'user',
+    };
 
     const form = useForm<InsertSchemaType | UpdateSchemaType>({
-        defaultValues: user ?? {
-            username: '',
-            password: '',
-            email: '',
-            p_name: '',
-            f_name: '',
-            l_name: '',
-            role: 'user',
-        },
+        defaultValues,
         resolver: zodResolver(schema),
         mode: "onChange"
     });
 
+    // เก็บข้อมูลเดิมเมื่อ user prop เปลี่ยน
     useEffect(() => {
         if (user) {
             form.reset(user);
-            console.log(user);
-            
+            setOriginalData(user);
         }
-    }, [user]);
+    }, [user, form]);
+
+    // ตรวจสอบว่าข้อมูลมีการเปลี่ยนแปลงหรือไม่
+    const watchedValues = form.watch();
+    const hasChanges = () => {
+        if (mode === "create") return true; // สำหรับการสร้างใหม่ให้เปิดปุ่มเสมอ
+        if (!originalData) return false;
+
+        // เปรียบเทียบข้อมูลปัจจุบันกับข้อมูลเดิม
+        return JSON.stringify(watchedValues) !== JSON.stringify(originalData);
+    };
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
         onSubmit(data);
     };
 
+    // ตรวจสอบว่าปุ่มควรถูกปิดหรือไม่
+    const isSaveDisabled = isLoading || (mode === "edit" && !hasChanges()) || !form.formState.isValid;
+
     return (
         <Card className="rounded-lg border-none mt-6">
             <CardContent>
                 {isLoading ? (
-                    <FormSkeleton />
+                    <Loading/>
                 ) : (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -189,14 +151,18 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit }: Pr
                             </div>
 
                             <div className="flex justify-between items-center">
-                                <BackButton title="ย้อนกลับ" variant={"outline"} />
+                                <BackButton variant={"outline"} />
                                 <Button
                                     type="submit"
-                                    disabled={isLoading}
-                                    variant={"default"}
+                                    disabled={isSaveDisabled}
+                                    variant={isSaveDisabled ? "secondary" : "default"}
+                                    className={isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                 >
                                     {isLoading
-                                        ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+                                        ? "กำลังบันทึก..." 
+                                        : mode === "edit" && !hasChanges() 
+                                            ? "บันทึกข้อมูล"
+                                            : "บันทึกข้อมูล"}
                                 </Button>
                             </div>
                         </form>

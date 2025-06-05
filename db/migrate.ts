@@ -1,15 +1,15 @@
 import { db } from './index'
-import { migrate } from 'drizzle-orm/neon-http/migrator'
+import { migrate } from 'drizzle-orm/node-postgres/migrator'
 
 const main = async () => {
     try {
         await migrate(db, {
-            migrationsFolder: 'db/migrations'
+            migrationsFolder: 'drizzle' // หรือ 'db/migrations' ถ้าคุณวางไว้ตรงนั้น
         })
-        console.log("Migration completed");
+        console.log("✅ Migration completed");
     } catch (error) {
-        console.log("Error during migration: ", error);
-        process.exit(1)
+        console.error("❌ Error during migration:", error);
+        process.exit(1);
     }
 }
 

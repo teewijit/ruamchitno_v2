@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   totalItems: number
   search?: string
   onSearchChange?: (value: string) => void
+  selected?: boolean 
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +45,7 @@ export function DataTable<TData, TValue>({
   totalPages,
   currentPage,
   totalItems,
+  selected = false,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -140,6 +142,7 @@ export function DataTable<TData, TValue>({
         currentPage={currentPage}
         onPageChange={onPageChange}
         onTotalItemsChange={onTotalItemsChange}
+        selected={selected}
       />
     </div>
   )

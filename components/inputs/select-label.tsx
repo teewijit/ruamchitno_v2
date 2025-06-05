@@ -23,7 +23,7 @@ export function SelectWithLabel<S>({
   nameInSchema,
   data,
   className,
-  placeholder = "Please select...",
+  placeholder = "กรุณาเลือก...",
   disabled = false,
 }: Props<S>) {
   const form = useFormContext();

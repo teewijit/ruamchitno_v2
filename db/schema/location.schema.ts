@@ -1,7 +1,6 @@
 import { pgTable, serial, varchar, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-/* ---------- Province ---------- */
 export const provinces = pgTable("provinces", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -11,7 +10,6 @@ export const provincesRelations = relations(provinces, ({ many }) => ({
   amphoes: many(amphoes),
 }));
 
-/* ---------- Amphoe ---------- */
 export const amphoes = pgTable("amphoes", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
@@ -26,7 +24,6 @@ export const amphoesRelations = relations(amphoes, ({ one, many }) => ({
   tambons: many(tambons),
 }));
 
-/* ---------- Tambon ---------- */
 export const tambons = pgTable("tambons", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),

@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+    image: ruamchitno_v2
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - node_modules/
+            # - .next/
+            # - Dockerfile
+            # - docker-compose.yml
+        - action: rebuild
+          path: package.json
+  postgres:
+    image: postgres:17
+    container_name: my_postgres
+    environment:
+      POSTGRES_DB: ruamchitno_db
+      POSTGRES_USER: ruamchitno
+      POSTGRES_PASSWORD: ruamchitno
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    
+volumes:
+  postgres_data:

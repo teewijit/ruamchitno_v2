@@ -20,7 +20,7 @@ export async function GET(
                 performedAt: auditLogs.performed_at,
                 performedBy: {
                     id: users.id,
-                    name: users.fullname,
+                    name: users.full_name,
                     email: users.email,
                 },
             })

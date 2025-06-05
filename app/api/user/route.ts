@@ -71,14 +71,12 @@ async function postHandler(req: NextRequest) {
         const validData = insertUserSchema.parse(body);
 
         const hashedPassword = await bcrypt.hash(validData.password, 10)
-        validData.password = hashedPassword;
-
-        const pname = validData.p_name ?? '';
+        validData.password = hashedPassword;        const pname = validData.p_name ?? '';
         const fname = validData.f_name ?? '';
         const lname = validData.l_name ?? '';
-        const fullname = `${pname}${fname} ${lname}`.trim();
+        const full_name = `${pname}${fname} ${lname}`.trim();
 
-        validData.fullname = fullname;
+        validData.full_name = full_name;
 
         const result = await db.insert(users).values(validData).returning();
         const newData = result[0];

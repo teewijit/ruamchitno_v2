@@ -101,7 +101,7 @@ CREATE TABLE "users" (
 	"p_name" varchar(100),
 	"f_name" varchar(100),
 	"l_name" varchar(100),
-	"fullname" varchar(255),
+	"full_name" varchar(255),
 	"role" "role_enum" DEFAULT 'user' NOT NULL,
 	"status" "status_enum" DEFAULT 'inactive' NOT NULL,
 	"create_at" timestamp with time zone DEFAULT now(),

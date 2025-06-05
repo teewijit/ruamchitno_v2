@@ -1,5 +1,6 @@
 import { numeric, pgTable, serial, integer, timestamp, varchar } from "drizzle-orm/pg-core";
 import { funds } from "./fund.schema";
+import { relations } from "drizzle-orm";
 
 export const fundYearlyAmounts = pgTable("fund_yearly_amounts", {
     id: serial("id").primaryKey(),
@@ -11,3 +12,10 @@ export const fundYearlyAmounts = pgTable("fund_yearly_amounts", {
     create_at: timestamp("create_at", { withTimezone: true }).defaultNow(),
     update_at: timestamp("update_at", { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
 });
+
+export const fundYearlyAmountsRelations = relations(fundYearlyAmounts, ({ one }) => ({
+    fund: one(funds, {
+        fields: [fundYearlyAmounts.fund_id],
+        references: [funds.id],
+    }),
+}));

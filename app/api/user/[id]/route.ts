@@ -53,7 +53,7 @@ export async function putHandler(
     const { p_name = "", f_name = "", l_name = "" } = validData;
     const fullname = `${p_name}${f_name} ${l_name}`.trim();
 
-    validData.fullname = fullname;
+    validData.full_name = fullname;
 
     const { id, ...updateData } = validData;
 

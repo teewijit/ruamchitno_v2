@@ -4,6 +4,8 @@ import { youths } from "@/db/schema/youth.schema";
 import { classes } from "@/db/schema/class.schema";
 import { AuthGuard } from "@/lib/auth-guard";
 import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
+import { insertYouthSchema } from "@/zod-schema/youth.zod";
+import { logAction } from "@/lib/audit-logs";
 
 export const GET = AuthGuard(async (req: NextRequest) => {
     try {
@@ -78,3 +80,36 @@ export const GET = AuthGuard(async (req: NextRequest) => {
         );
     }
 });
+
+async function postHandler(req: NextRequest) {
+
+    try {
+        const body = await req.json();
+
+        const validData = insertYouthSchema.parse(body);
+
+        const pname = validData.p_name ?? '';
+        const fname = validData.f_name ?? '';
+        const lname = validData.l_name ?? '';
+        const fullname = `${pname}${fname} ${lname}`.trim();
+
+        validData.full_name = fullname;
+
+        const result = await db.insert(youths).values(validData).returning();
+        const newData = result[0];
+
+        await logAction({
+            table: "youths",
+            action: "create",
+            recordId: newData.id,
+        });
+
+        return NextResponse.json(newData, { status: 201 });
+    } catch (error) {
+        console.error("Error creating user:", error);
+        return NextResponse.json(
+            { message: error },
+            { status: 500 }
+        );
+    }
+}

@@ -5,6 +5,9 @@ import amphoesData from '@/lib/thailand-province-data/amphoes.json';
 import tambonsData from '@/lib/thailand-province-data/tambons.json';
 import { classes } from "./schema/class.schema";
 import { affiliations } from "./schema/affiliation.schema";
+import { users } from "./schema";
+import { insertUserSchema } from "@/zod-schema/user.zod";
+import bcrypt from "bcryptjs";
 
 type ProvinceJson = {
   id: number;
@@ -22,6 +25,31 @@ type TambonJson = {
   name_th: string;
   amphoe_id: number;
 };
+
+async function seedAdminUser() {
+  try {
+    console.log("🌱 เริ่ม seed ข้อมูล admin user");
+    const req = { id: 1, username: 'admin', password: '1234', email: 'admin@admin.com', p_name: 'คุณ', f_name: 'แอดมิน', l_name: 'ระบบ', role: 'admin', status: 'inactive' };
+    
+    const validData = insertUserSchema.parse(req);
+
+    const hashedPassword = await bcrypt.hash(validData.password, 10);
+
+    validData.password = hashedPassword;
+    const pname = validData.p_name ?? '';
+    const fname = validData.f_name ?? '';
+    const lname = validData.l_name ?? '';
+    const full_name = `${pname}${fname} ${lname}`.trim();
+
+    validData.full_name = full_name;
+
+    await db.insert(users).values(validData).onConflictDoNothing();
+    console.log("✅ เสร็จสิ้นการ seed ข้อมูล admin");
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการ seed:", err);
+    process.exit(1);
+  }
+}
 
 async function seedLocation() {
   try {
@@ -181,6 +209,7 @@ async function seedAffiliations() {
 
 
 async function runSeeds() {
+  await seedAdminUser();
   await seedLocation();
   await seedClasses();
   await seedAffiliations();

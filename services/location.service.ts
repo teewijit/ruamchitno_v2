@@ -5,6 +5,7 @@ import tambons from '@/lib/thailand-province-data/tambons.json';
 export type LocationOption = {
   value: number;
   label: string;
+  zip_code?: number;
 };
 
 export const getAllProvinces = (): LocationOption[] => {
@@ -29,10 +30,11 @@ export const getTambonsByAmphoeId = (amphoeId: number): LocationOption[] => {
     .map((t) => ({
       value: t.id,
       label: t.name_th,
+      zip_code: t.zip_code,
     }));
 };
 
-export const getZipCodeByTambonId = (tambonId: number): string | null => {
+export const getZipCodeByTambonId = (tambonId: number): string => {
   const tambon = tambons.find((t) => t.id === tambonId);
-  return tambon?.zip_code?.toString() ?? null;
+  return tambon?.zip_code?.toString() ?? "";
 };

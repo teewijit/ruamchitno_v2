@@ -1,4 +1,3 @@
-// @/middleware/auth.ts
 import { getServerSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/db";
@@ -22,8 +21,11 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
+
                 const result = loginSchema.safeParse(credentials);
+                
                 if (!result.success) return null;
+                console.log(result);
 
                 const { username, password } = result.data;
 
@@ -46,7 +48,7 @@ export const authOptions: NextAuthOptions = {
                 return {
                     id: String(user.id),
                     username: user.username,
-                    fullname: user.fullname,
+                    fullname: user.full_name,
                     role: user.role
                 };
             },

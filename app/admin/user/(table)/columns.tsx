@@ -23,30 +23,6 @@ export function getColumns({
 }): ColumnDef<SelectUserSchemaType>[] {
   return [
     {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value: any) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-[2px]"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value: any) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-[2px]"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
       accessorKey: "username",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Username" />
@@ -65,18 +41,18 @@ export function getColumns({
       },
     },
     {
-      accessorKey: "fullname",
+      accessorKey: "full_name",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="ชื่อ-นามสกุล" />
       ),
       cell: ({ row }) => {
-        const label = labels.find((label) => label.value === row.original.fullname)
+        const label = labels.find((label) => label.value === row.original.full_name)
 
         return (
           <div className="flex space-x-2">
             {label && <Badge variant="outline">{label.label}</Badge>}
             <span className="max-w-[500px] truncate font-medium">
-              {row.getValue("fullname")}
+              {row.getValue("full_name")}
             </span>
           </div>
         )

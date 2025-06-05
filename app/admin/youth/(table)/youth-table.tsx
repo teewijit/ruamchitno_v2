@@ -5,9 +5,9 @@ import { getColumns } from "./columns";
 import { useSearchParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { useCallback, useState } from "react";
-import { UserViewDialog } from "../(dialog)/user-view-dialog";
 import { toast } from 'sonner';
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { AuditLogs } from "@/components/audit-logs/audit-dialog";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -135,7 +135,7 @@ export default function YouthTable() {
                 totalItems={totalItems}
                 onTotalItemsChange={setTotalItemsParam}
             />
-            <UserViewDialog
+            <AuditLogs
                 isOpen={dialogOpen}
                 onClose={() => setDialogOpen(false)}
                 viewId={viewId}
