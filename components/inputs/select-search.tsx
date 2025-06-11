@@ -37,6 +37,7 @@ type Props<S> = {
     placeholder?: string;
     disabled?: boolean;
     onChange?: (selected: DataObj | undefined) => void;
+    isRequired?: boolean;
 };
 
 export function SelectWithSearch<S>({
@@ -47,6 +48,7 @@ export function SelectWithSearch<S>({
     placeholder = "Please select...",
     disabled = false,
     onChange,
+    isRequired = false,
 }: Props<S>) {
     const form = useFormContext();
     const [inputValue, setInputValue] = useState("");
@@ -66,7 +68,7 @@ export function SelectWithSearch<S>({
                 return (
                     <FormItem className={cn("w-full", className)}>
                         <FormLabel className="text-base" htmlFor={nameInSchema}>
-                            {fieldTitle}
+                            {fieldTitle} {isRequired && <span className="text-red-500">*</span>}
                         </FormLabel>
                         <FormControl>
                             <Popover>

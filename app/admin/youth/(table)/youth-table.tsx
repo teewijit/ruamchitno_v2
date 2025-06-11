@@ -70,10 +70,9 @@ export default function YouthTable() {
         setDialogOpen(true);
     };
 
-
     // edit data
     const handleEdit = (id: string | number) => {
-        router.push(`user/form?userId=${id}`);
+        router.push(`youth/form?youthId=${id}`);
     };
 
     // soft delete
@@ -87,7 +86,7 @@ export default function YouthTable() {
         if (!deleteTargetId) return;
 
         try {
-            const savePromise = fetch(`/api/user/${deleteTargetId}`, {
+            const savePromise = fetch(`/api/youth/${deleteTargetId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -138,7 +137,7 @@ export default function YouthTable() {
             <AuditLogs
                 isOpen={dialogOpen}
                 onClose={() => setDialogOpen(false)}
-                viewId={viewId}
+                dataObj={parseInt(viewId as string) > 0 ? [{ id: parseInt(viewId as string), table: "youths" }] : []}
             />
             <ConfirmDialog
                 open={confirmDialogOpen}

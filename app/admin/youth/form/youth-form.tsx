@@ -42,7 +42,7 @@ const insertSchema = z.object({
         .regex(/^\d{5}$/, "รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก")
         .optional(),
     year_start: z.string().optional(),
-    class_id: z.coerce.number().optional(),
+    class_id: z.coerce.number().min(1, "กรุณาเลือกชั้นเรียน"),
     remark: z.string().optional(),
     status: z.enum(["active", "inactive"]).default("active").optional(),
 });
@@ -57,7 +57,8 @@ type Props = {
     isLoading?: boolean,
     mode: "create" | "edit",
     classes?: { id: number, short_name: string }[],
-    onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void
+    onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void,
+    isSubmitting?: boolean
 };
 
 export default function YouthForm({
@@ -65,37 +66,69 @@ export default function YouthForm({
     isLoading = false,
     mode,
     classes = [],
-    onSubmit
+    onSubmit,
+    isSubmitting = false
 }: Props) {
     const schema = mode === "create" ? insertSchema : updateSchema;
+    const [originalData, setOriginalData] = useState<InsertSchemaType | UpdateSchemaType | null>(null);
+    const [isFormReady, setIsFormReady] = useState(false);
+
+    // ตั้งค่า default values
+    const defaultValues = {
+        citizen_id: '',
+        email: '',
+        f_name: '',
+        l_name: '',
+        p_name: '',
+        phone: '',
+        address: '',
+        tambon: 0,
+        amphoe: 0,
+        province: 0,
+        zip_code: '',
+        year_start: '',
+        class_id: 0,
+        remark: '',
+        status: 'active' as "active" | "inactive"
+    };
 
     const form = useForm<InsertSchemaType | UpdateSchemaType>({
-        defaultValues: youth ?? {
-            citizen_id: '',
-            email: '',
-            f_name: '',
-            l_name: '',
-            p_name: '',
-            phone: '',
-            address: '',
-            tambon: 0,
-            amphoe: 0,
-            province: 0,
-            zip_code: '',
-            year_start: '',
-            class_id: undefined,
-            remark: '',
-            status: 'active'
-        },
+        defaultValues,
         resolver: zodResolver(schema),
         mode: "onBlur"
     });
 
+    // จัดการข้อมูลเมื่อ youth prop เปลี่ยน
     useEffect(() => {
-        if (youth) {
-            form.reset(youth);
+        if (mode === "create") {
+            // สำหรับ create mode
+            form.reset(defaultValues);
+            setOriginalData(defaultValues);
+            setIsFormReady(true);
+        } else if (mode === "edit") {
+            if (youth) {
+                // สำหรับ edit mode เมื่อมีข้อมูล youth
+                console.log('Resetting form with youth data:', youth);
+                form.reset(youth);
+                setOriginalData(youth);
+                // ตั้งค่า selected province และ amphoe
+                setSelectedProvince(youth.province);
+                setSelectedAmphoe(youth.amphoe);
+                setIsFormReady(true);
+            } else {
+                // รอข้อมูล youth
+                setIsFormReady(false);
+            }
         }
-    }, [youth]);
+    }, [youth, mode, form]);
+
+    // ตรวจสอบว่าข้อมูลมีการเปลี่ยนแปลงหรือไม่
+    const watchedValues = form.watch();
+    const hasChanges = () => {
+        if (mode === "create") return true;
+        if (!originalData) return false;
+        return JSON.stringify(watchedValues) !== JSON.stringify(originalData);
+    };
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
         onSubmit(data);
@@ -128,6 +161,7 @@ export default function YouthForm({
             setSelectedAmphoe(selected.value);
             // รีเซ็ตค่าตำบลเมื่อเปลี่ยนอำเภอ
             form.setValue("tambon", 0);
+            form.setValue("zip_code", "");
         } else {
             setSelectedAmphoe(0);
         }
@@ -168,10 +202,15 @@ export default function YouthForm({
         }
     }, [selectedAmphoe]);
 
+    // ตรวจสอบว่าปุ่มควรถูกปิดหรือไม่
+    const isSaveDisabled = isSubmitting ||
+        (mode === "edit" && !hasChanges()) ||
+        !form.formState.isValid;
+        
     return (
         <Card className="rounded-lg border-none mt-6">
             <CardContent>
-                {isLoading ? (
+                {isLoading || !isFormReady ? (
                     <Loading />
                 ) : (
                     <Form {...form}>
@@ -208,6 +247,7 @@ export default function YouthForm({
                                                 label: cls.short_name
                                             }))
                                         }
+                                        isRequired={true}
                                     />
                                 </div>
                             </div>
@@ -219,6 +259,7 @@ export default function YouthForm({
                                         nameInSchema="p_name"
                                         placeholder="เลือกคำนำหน้า"
                                         data={optionsTitle}
+                                        isRequired={true}
                                     ></SelectWithLabel>
                                 </div>
 
@@ -226,6 +267,7 @@ export default function YouthForm({
                                     <InputWithLabel<InsertSchemaType | UpdateSchemaType>
                                         fieldTitle="ชื่อจริง"
                                         nameInSchema="f_name"
+                                        isRequired={true}
                                     />
                                 </div>
 
@@ -233,6 +275,7 @@ export default function YouthForm({
                                     <InputWithLabel<InsertSchemaType | UpdateSchemaType>
                                         fieldTitle="นามสกุล"
                                         nameInSchema="l_name"
+                                        isRequired={true}
                                     />
                                 </div>
                             </div>
@@ -252,6 +295,7 @@ export default function YouthForm({
                                         placeholder="เลือกจังหวัด"
                                         data={optionsProvince}
                                         onChange={onChangeProvince}
+                                        isRequired={true}
                                     />
                                 </div>
                                 <div className="col-span-12 md:col-span-4">
@@ -262,6 +306,7 @@ export default function YouthForm({
                                         data={optionsAmphoe}
                                         disabled={!selectedProvince}
                                         onChange={onChangeAmphoe}
+                                        isRequired={true}
                                     />
                                 </div>
                                 <div className="col-span-12 md:col-span-4">
@@ -272,6 +317,7 @@ export default function YouthForm({
                                         data={optionsTambon}
                                         disabled={!selectedAmphoe}
                                         onChange={onChangeTambon}
+                                        isRequired={true}
                                     />
                                 </div>
                             </div>
@@ -282,6 +328,7 @@ export default function YouthForm({
                                         fieldTitle="รหัสไปรษณีย์"
                                         nameInSchema="zip_code"
                                         maxLength={5}
+                                        isRequired={true}
                                     />
                                 </div>
                                 <div className="col-span-12 md:col-span-6">
@@ -303,11 +350,15 @@ export default function YouthForm({
                                 <BackButton title="ย้อนกลับ" variant={"outline"} />
                                 <Button
                                     type="submit"
-                                    disabled={isLoading}
-                                    variant={"default"}
+                                    disabled={isSaveDisabled}
+                                    variant={isSaveDisabled ? "secondary" : "default"}
+                                    className={isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                 >
-                                    {isLoading
-                                        ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
+                                    {isSubmitting
+                                        ? "กำลังบันทึก..."
+                                        : mode === "edit" && !hasChanges()
+                                            ? "ไม่มีการเปลี่ยนแปลง"
+                                            : "บันทึกข้อมูล"}
                                 </Button>
                             </div>
                         </form>

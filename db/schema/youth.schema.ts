@@ -20,7 +20,7 @@ export const youths = pgTable("youths", {
   zip_code: varchar("zip_code", { length: 5 }),
   full_address: text("full_address"),
   year_start: varchar("year_start", { length: 10 }),
-  class_id: integer("class_id").default(0).references(() => classes.id),
+  class_id: integer("class_id").references(() => classes.id),
   remark: text("remark"),
   status: statusEnum("status").default("active").notNull(),
   create_at: timestamp("create_at", { withTimezone: true }).defaultNow(),

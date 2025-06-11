@@ -14,10 +14,15 @@ import { CardContent } from "@/components/ui/card";
 import useSWR from "swr";
 import Loading from "./loading";
 
+interface DataObj {
+  id: number;
+  table: string;
+}
+
 interface AuditLogsProps {
   isOpen: boolean;
   onClose: () => void;
-  viewId: string | number;
+  dataObj: DataObj[];
 }
 
 interface AuditLog {
@@ -38,11 +43,11 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export const AuditLogs: React.FC<AuditLogsProps> = ({
   isOpen,
   onClose,
-  viewId,
+  dataObj
 }) => {
 
   const { data, isLoading } = useSWR(
-    viewId != 0 ? `/api/audit-logs/user/${viewId}` : null,
+    dataObj.length > 0 ? `/api/audit-logs?id=${dataObj[0].id}&table=${dataObj[0].table}` : null,
     fetcher
   );
 

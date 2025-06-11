@@ -68,7 +68,12 @@ type Props = {
     isSubmitting?: boolean
 };
 
-export default function UserForm({ user, isLoading = false, mode, onSubmit, isSubmitting = false }: Props) {
+export default function UserForm({
+    user,
+    isLoading = false,
+    mode, onSubmit,
+    isSubmitting = false
+}: Props) {
     const schema = mode === "create" ? insertSchema : updateSchema;
     const [originalData, setOriginalData] = useState<InsertSchemaType | UpdateSchemaType | null>(null);
     const [isFormReady, setIsFormReady] = useState(false);

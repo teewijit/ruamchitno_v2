@@ -5,10 +5,11 @@ import { auditLogs } from "@/db/schema/audit-log.schema";
 import { users } from "@/db/schema/user.schema";
 
 export async function GET(
-    req: NextRequest,
-    context: { params: { id: string } }  
+    req: NextRequest
 ) {
-    const { id } = await context.params;
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    const table = searchParams.get("table");
 
     try {
         const logs = await db
@@ -28,8 +29,8 @@ export async function GET(
             .leftJoin(users, eq(auditLogs.performed_by, users.id))
             .where(
                 and(
-                    eq(auditLogs.record_id, parseInt(id)),
-                    eq(auditLogs.table_name, "users")
+                    eq(auditLogs.record_id, parseInt(id ?? '0')),
+                    eq(auditLogs.table_name, table ?? '')
                 )
             )
             .orderBy(desc(auditLogs.performed_at));

@@ -6,6 +6,9 @@ import { AuthGuard } from "@/lib/auth-guard";
 import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
 import { insertYouthSchema } from "@/zod-schema/youth.zod";
 import { logAction } from "@/lib/audit-logs";
+import {
+    getFullAddress,
+} from '@/services/location.service';
 
 export const GET = AuthGuard(async (req: NextRequest) => {
     try {
@@ -81,7 +84,7 @@ export const GET = AuthGuard(async (req: NextRequest) => {
     }
 });
 
-async function postHandler(req: NextRequest) {
+export const POST = AuthGuard(async (req: NextRequest) => {
 
     try {
         const body = await req.json();
@@ -94,6 +97,9 @@ async function postHandler(req: NextRequest) {
         const fullname = `${pname}${fname} ${lname}`.trim();
 
         validData.full_name = fullname;
+        
+        const full_address = getFullAddress(validData.address ?? '', validData.tambon ?? 0, validData.amphoe ?? 0, validData.province ?? 0, validData.zip_code ?? '');
+        validData.full_address = full_address;
 
         const result = await db.insert(youths).values(validData).returning();
         const newData = result[0];
@@ -112,4 +118,4 @@ async function postHandler(req: NextRequest) {
             { status: 500 }
         );
     }
-}
+});

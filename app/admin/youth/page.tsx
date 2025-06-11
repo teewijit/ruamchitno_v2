@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Card, CardContent } from "@/components/ui/card";
 import YouthTable from "./(table)/youth-table";
 
-export default function UserPage() {
+export default function YouthPage() {
 
     return (
         <ContentLayout title="เยาวชน">

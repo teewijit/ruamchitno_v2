@@ -72,7 +72,6 @@ export default function UserTable() {
         setDialogOpen(true);
     };
 
-
     // edit data
     const handleEdit = (id: string | number) => {
         router.push(`user/form?userId=${id}`);
@@ -186,7 +185,7 @@ export default function UserTable() {
             <AuditLogs
                 isOpen={dialogOpen}
                 onClose={() => setDialogOpen(false)}
-                viewId={viewId}
+                dataObj={parseInt(viewId as string) > 0 ? [{ id: parseInt(viewId as string), table: "users" }] : []}
             />
             <ConfirmDialog
                 open={confirmDialogOpen}
