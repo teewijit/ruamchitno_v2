@@ -5,6 +5,7 @@ import { users } from "@/db/schema/user.schema";
 import { AuthGuard } from "@/lib/auth-guard";
 import bcrypt from 'bcryptjs'
 import { passwordSchema } from "@/zod-schema/user.zod";
+import { logAction } from "@/lib/audit-logs";
 
 export async function patchHandler(
     req: NextRequest,
@@ -30,6 +31,12 @@ export async function patchHandler(
         if (!result.length) {
             return NextResponse.json({ message: "ไม่พบผู้ใช้งาน" }, { status: 404 });
         }
+
+        await logAction({
+            table: "users",
+            action: "update",
+            recordId: parseInt(id),
+        });
 
         return NextResponse.json({ message: "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว" });
     } catch (error) {

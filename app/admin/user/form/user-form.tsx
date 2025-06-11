@@ -14,10 +14,24 @@ import { roles } from "@/components/table/data";
 import Loading from "./loading";
 import { optionsTitle } from "@/lib/titles";
 
+const checkUsernameAvailable = async (username: string) => {
+    if (!username || username.trim() === "") return true; // ว่าง = ถือว่า valid ไปก่อน
+
+    const res = await fetch(`/api/user/check-username?username=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    return !data.exists;
+};
+
+
 const insertSchema = z.object({
     username: z.string()
         .min(1, "กรุณากรอกชื่อผู้ใช้")
-        .max(255, "ชื่อผู้ใช้ต้องไม่เกิน 255 ตัวอักษร"),
+        .max(255, "ชื่อผู้ใช้ต้องไม่เกิน 255 ตัวอักษร")
+        .refine(async (username) => {
+            return await checkUsernameAvailable(username);
+        }, {
+            message: "ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว",
+        }),
     password: z.string()
         .min(4, "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร")
         .max(255, "รหัสผ่านต้องไม่เกิน 255 ตัวอักษร"),
@@ -106,7 +120,6 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit, isSu
     };
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
-        console.log('Form submitted:', data);
         onSubmit(data);
     };
 
@@ -147,6 +160,7 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit, isSu
                                     fieldTitle="ชื่อผู้ใช้งาน"
                                     nameInSchema="username"
                                     isRequired={true}
+                                    disabled={mode === "edit"}
                                 />
                             </div>
                         </div>

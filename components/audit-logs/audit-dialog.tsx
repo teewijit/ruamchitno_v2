@@ -12,6 +12,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardContent } from "@/components/ui/card";
 import useSWR from "swr";
+import Loading from "./loading";
 
 interface AuditLogsProps {
   isOpen: boolean;
@@ -30,15 +31,6 @@ interface AuditLog {
     name: string;
     email: string;
   };
-}
-
-const FormSkeleton = () => {
-  return (
-    <div className="space-y-6">
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-20 w-full" />
-    </div>
-  )
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -68,7 +60,7 @@ export const AuditLogs: React.FC<AuditLogsProps> = ({
 
           <div className="max-h-[250px] overflow-y-auto">
             {isLoading ? (
-              <FormSkeleton />
+              <Loading />
             ) : data && data.length > 0 ? (
               <>
                 {data.map((log: AuditLog) => (
