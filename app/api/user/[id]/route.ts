@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users } from "@/db/schema/user.schema";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { AuthGuard } from "@/lib/auth-guard";
 import { updateUserSchema } from "@/zod-schema/user.zod";
 import { logAction } from "@/lib/audit-logs";
@@ -49,6 +49,27 @@ export async function putHandler(
       ...body,
       id: parseInt(userId),
     });
+
+    // ตรวจสอบ username ซ้ำ (ยกเว้น user ปัจจุบัน)
+    if (validData.username) {
+      const existingUser = await db
+        .select()
+        .from(users)
+        .where(
+          and(
+            eq(users.username, validData.username),
+            ne(users.id, parseInt(userId))
+          )
+        )
+        .limit(1);
+
+      if (existingUser.length > 0) {
+        return NextResponse.json(
+          { message: "ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว" },
+          { status: 400 }
+        );
+      }
+    }
 
     const { p_name = "", f_name = "", l_name = "" } = validData;
     const fullname = `${p_name}${f_name} ${l_name}`.trim();

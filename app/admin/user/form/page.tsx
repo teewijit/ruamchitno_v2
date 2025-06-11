@@ -28,6 +28,9 @@ export default function UserFormPage() {
         fetcher
     );
 
+    console.log(user);
+    
+
     const handleFormSubmit = async (data: any) => {
         const url = userId
             ? `/api/user/${userId}`

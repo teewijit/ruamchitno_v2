@@ -12,6 +12,7 @@ import { BackButton } from '@/components/ui/back-button';
 import { useEffect, useState } from "react";
 import { roles } from "@/components/table/data";
 import Loading from "./loading";
+import { optionsTitle } from "@/lib/titles";
 
 const insertSchema = z.object({
     username: z.string()
@@ -49,14 +50,17 @@ type Props = {
     user?: InsertSchemaType | UpdateSchemaType,
     isLoading?: boolean,
     mode: "create" | "edit",
-    onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void
+    onSubmit: (data: InsertSchemaType | UpdateSchemaType) => void,
+    isSubmitting?: boolean
 };
 
-export default function UserForm({ user, isLoading = false, mode, onSubmit }: Props) {
+export default function UserForm({ user, isLoading = false, mode, onSubmit, isSubmitting = false }: Props) {
     const schema = mode === "create" ? insertSchema : updateSchema;
     const [originalData, setOriginalData] = useState<InsertSchemaType | UpdateSchemaType | null>(null);
+    const [isFormReady, setIsFormReady] = useState(false);
 
-    const defaultValues = user ?? {
+    // ตั้งค่า default values
+    const defaultValues = {
         username: '',
         password: '',
         email: '',
@@ -69,106 +73,142 @@ export default function UserForm({ user, isLoading = false, mode, onSubmit }: Pr
     const form = useForm<InsertSchemaType | UpdateSchemaType>({
         defaultValues,
         resolver: zodResolver(schema),
-        mode: "onChange"
+        mode: "onBlur"
     });
 
-    // เก็บข้อมูลเดิมเมื่อ user prop เปลี่ยน
+    // จัดการข้อมูลเมื่อ user prop เปลี่ยน
     useEffect(() => {
-        if (user) {
-            form.reset(user);
-            setOriginalData(user);
+        if (mode === "create") {
+            // สำหรับ create mode
+            form.reset(defaultValues);
+            setOriginalData(defaultValues);
+            setIsFormReady(true);
+        } else if (mode === "edit") {
+            if (user) {
+                // สำหรับ edit mode เมื่อมีข้อมูล user
+                console.log('Resetting form with user data:', user);
+                form.reset(user);
+                setOriginalData(user);
+                setIsFormReady(true);
+            } else {
+                // รอข้อมูล user
+                setIsFormReady(false);
+            }
         }
-    }, [user, form]);
+    }, [user, mode, form]);
 
     // ตรวจสอบว่าข้อมูลมีการเปลี่ยนแปลงหรือไม่
     const watchedValues = form.watch();
     const hasChanges = () => {
-        if (mode === "create") return true; // สำหรับการสร้างใหม่ให้เปิดปุ่มเสมอ
+        if (mode === "create") return true;
         if (!originalData) return false;
-
-        // เปรียบเทียบข้อมูลปัจจุบันกับข้อมูลเดิม
         return JSON.stringify(watchedValues) !== JSON.stringify(originalData);
     };
 
     const handleSubmit = async (data: InsertSchemaType | UpdateSchemaType) => {
+        console.log('Form submitted:', data);
         onSubmit(data);
     };
 
+    // แสดง loading หากยังไม่พร้อม
+    if (isLoading || !isFormReady) {
+        return (
+            <Card className="rounded-lg border-none mt-6">
+                <CardContent>
+                    <div className="flex justify-center items-center py-8">
+                        <Loading />
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
     // ตรวจสอบว่าปุ่มควรถูกปิดหรือไม่
-    const isSaveDisabled = isLoading || (mode === "edit" && !hasChanges()) || !form.formState.isValid;
+    const isSaveDisabled = isSubmitting ||
+        (mode === "edit" && !hasChanges()) ||
+        !form.formState.isValid;
 
     return (
         <Card className="rounded-lg border-none mt-6">
             <CardContent>
-                {isLoading ? (
-                    <Loading/>
-                ) : (
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                        <div className="grid grid-cols-12 gap-4">
+                            <div className="col-span-12 md:col-span-3 lg:col-span-2">
+                                <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    fieldTitle="บทบาท"
+                                    nameInSchema="role"
+                                    data={roles}
+                                    isRequired={true}
+                                />
+                            </div>
+                            <div className="col-span-12 md:col-span-9 lg:col-span-10">
+                                <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    fieldTitle="ชื่อผู้ใช้งาน"
+                                    nameInSchema="username"
+                                    isRequired={true}
+                                />
+                            </div>
+                        </div>
 
-                            <div className="grid grid-cols-12 gap-4">
-                                <div className="col-span-12 md:col-span-2">
-                                    <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
-                                        fieldTitle="บทบาท"
-                                        nameInSchema="role"
-                                        data={roles}
-                                    />
-                                </div>
-                                <div className="col-span-12 md:col-span-10">
-                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
-                                        fieldTitle="ชื่อผู้ใช้งาน"
-                                        nameInSchema="username"
-                                    />
-                                </div>
+                        {mode === "create" && (
+                            <InputWithLabel<InsertSchemaType>
+                                fieldTitle="รหัสผ่าน"
+                                nameInSchema="password"
+                                isPassword={true}
+                                isRequired={true}
+                            />
+                        )}
+
+                        <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                            fieldTitle="อีเมล"
+                            nameInSchema="email"
+                            isRequired={true}
+                        />
+
+                        <div className="grid grid-cols-12 gap-4">
+                            <div className="col-span-4 md:col-span-3 xl:col-span-2">
+                                <SelectWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    fieldTitle="คำนำหน้า"
+                                    nameInSchema="p_name"
+                                    placeholder="เลือกคำนำหน้า"
+                                    data={optionsTitle}
+                                />
                             </div>
 
-                            {mode === "create" && (
-                                <InputWithLabel<InsertSchemaType> fieldTitle="รหัสผ่าน" nameInSchema="password" isPassword={true} />
-                            )}
-                            <InputWithLabel<InsertSchemaType | UpdateSchemaType> fieldTitle="อีเมล" nameInSchema="email" />
-
-                            <div className="grid grid-cols-12 gap-4">
-                                <div className="col-span-4 md:col-span-2">
-                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
-                                        fieldTitle="คำนำหน้า"
-                                        nameInSchema="p_name"
-                                    />
-                                </div>
-
-                                <div className="col-span-8 md:col-span-5">
-                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
-                                        fieldTitle="ชื่อจริง"
-                                        nameInSchema="f_name"
-                                    />
-                                </div>
-
-                                <div className="col-span-12 md:col-span-5">
-                                    <InputWithLabel<InsertSchemaType | UpdateSchemaType>
-                                        fieldTitle="นามสกุล"
-                                        nameInSchema="l_name"
-                                    />
-                                </div>
+                            <div className="col-span-8 md:col-span-4 xl:col-span-5">
+                                <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    fieldTitle="ชื่อจริง"
+                                    nameInSchema="f_name"
+                                />
                             </div>
 
-                            <div className="flex justify-between items-center">
-                                <BackButton variant={"outline"} />
-                                <Button
-                                    type="submit"
-                                    disabled={isSaveDisabled}
-                                    variant={isSaveDisabled ? "secondary" : "default"}
-                                    className={isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}
-                                >
-                                    {isLoading
-                                        ? "กำลังบันทึก..." 
-                                        : mode === "edit" && !hasChanges() 
-                                            ? "บันทึกข้อมูล"
-                                            : "บันทึกข้อมูล"}
-                                </Button>
+                            <div className="col-span-12 md:col-span-5">
+                                <InputWithLabel<InsertSchemaType | UpdateSchemaType>
+                                    fieldTitle="นามสกุล"
+                                    nameInSchema="l_name"
+                                />
                             </div>
-                        </form>
-                    </Form>
-                )}
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <BackButton variant={"outline"} />
+                            <Button
+                                type="submit"
+                                disabled={isSaveDisabled}
+                                variant={isSaveDisabled ? "secondary" : "default"}
+                                className={isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}
+                            >
+                                {isSubmitting
+                                    ? "กำลังบันทึก..."
+                                    : mode === "edit" && !hasChanges()
+                                        ? "ไม่มีการเปลี่ยนแปลง"
+                                        : "บันทึกข้อมูล"}
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
             </CardContent>
         </Card>
-    )
+    );
 }

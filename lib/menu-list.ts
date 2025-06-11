@@ -3,7 +3,8 @@ import {
   UsersIcon,
   UserCog,
   SchoolIcon,
-  Layers2Icon
+  Layers2Icon,
+  FileSpreadsheet
 } from "lucide-react";
 
 type Submenu = {
@@ -58,7 +59,23 @@ export function getMenuList(pathname: string): Group[] {
       ]
     },
     {
-      groupLabel: "Settings",
+      groupLabel: "รายงาน",
+      menus: [
+        {
+          href: "",
+          label: "กองทุนถาวร",
+          icon: FileSpreadsheet,
+          submenus: [
+            {
+              href: "/posts",
+              label: "รายงานที่ 1"
+            },
+          ]
+        },
+      ]
+    },
+    {
+      groupLabel: "ระบบ",
       menus: [
         {
           href: "/user",

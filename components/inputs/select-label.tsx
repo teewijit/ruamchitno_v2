@@ -16,6 +16,7 @@ type Props<S> = {
   className?: string;
   placeholder?: string;
   disabled?: boolean;
+  isRequired?: boolean;
 };
 
 export function SelectWithLabel<S>({
@@ -25,6 +26,7 @@ export function SelectWithLabel<S>({
   className,
   placeholder = "กรุณาเลือก...",
   disabled = false,
+  isRequired = false,
 }: Props<S>) {
   const form = useFormContext();
 
@@ -36,6 +38,7 @@ export function SelectWithLabel<S>({
         <FormItem className={`w-full ${className}`}>
           <FormLabel className="text-base" htmlFor={nameInSchema}>
             {fieldTitle}
+            {isRequired && <span className="text-red-500">*</span>}
           </FormLabel>
           <Select
             value={field.value}

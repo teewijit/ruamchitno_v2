@@ -16,14 +16,16 @@ type Props<S> = {
     fieldTitle: string;
     nameInSchema: keyof S & string;
     className?: string;
-    isPassword?: boolean; // 👈 เพิ่มตัวเลือกนี้
+    isPassword?: boolean;
+    isRequired?: boolean;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export function InputWithLabel<S>({
     fieldTitle,
     nameInSchema,
     className,
-    isPassword = false, // 👈 ตั้ง default เป็น false
+    isPassword = false,
+    isRequired = false,
     ...props
 }: Props<S>) {
     const form = useFormContext();
@@ -36,6 +38,7 @@ export function InputWithLabel<S>({
                 <FormItem>
                     <FormLabel className="text-base" htmlFor={nameInSchema}>
                         {fieldTitle}
+                        {isRequired && <span className="text-red-500">*</span>}
                     </FormLabel>
 
                     <FormControl>

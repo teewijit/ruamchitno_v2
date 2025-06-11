@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { users } from "@/db/schema/user.schema";
-import { and, count, desc, ilike, ne, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { AuthGuard } from "@/lib/auth-guard";
 import bcrypt from 'bcryptjs'
@@ -64,14 +64,28 @@ async function getHandler(req: NextRequest) {
 }
 
 async function postHandler(req: NextRequest) {
-
     try {
         const body = await req.json();
-
         const validData = insertUserSchema.parse(body);
 
-        const hashedPassword = await bcrypt.hash(validData.password, 10)
-        validData.password = hashedPassword;        const pname = validData.p_name ?? '';
+        // ตรวจสอบ username ซ้ำ
+        const existingUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.username, validData.username))
+            .limit(1);
+
+        if (existingUser.length > 0) {
+            return NextResponse.json(
+                { message: "ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว" },
+                { status: 400 }
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(validData.password, 10);
+        validData.password = hashedPassword;
+        
+        const pname = validData.p_name ?? '';
         const fname = validData.f_name ?? '';
         const lname = validData.l_name ?? '';
         const full_name = `${pname}${fname} ${lname}`.trim();
